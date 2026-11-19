@@ -1,0 +1,1715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KSEAB 2nd PUC Chemistry Quiz &amp; Blueprint Prep</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              900: '#312e81'
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .perspective-1000 { perspective: 1000px; }
+    .preserve-3d { transform-style: preserve-3d; transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1); }
+    .backface-hidden { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+    .rotate-y-180 { transform: rotateY(180deg); }
+    .chem sub, .chem sup { font-size: 0.72em; line-height: 0; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col">
+
+  <!-- Top Navigation -->
+  <header class="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-slate-200">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2.5 min-w-0">
+        <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 3h6m-4 0v5.5L5.5 17.8A2 2 0 007.2 21h9.6a2 2 0 001.7-3.2L13 8.5V3" />
+          </svg>
+        </div>
+        <div class="truncate">
+          <h1 class="text-sm sm:text-base font-bold text-slate-900 truncate">KSEAB 2nd PUC Chemistry</h1>
+          <p class="text-xs text-slate-500 hidden sm:block">Subject 34 · 2026–27 Blueprint Quiz &amp; Revision</p>
+        </div>
+      </div>
+
+      <nav class="flex items-center gap-1 sm:gap-1.5 overflow-x-auto py-1">
+        <button data-nav="dashboard" class="nav-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium whitespace-nowrap transition-colors">Practice</button>
+        <button data-nav="flashcards" class="nav-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium whitespace-nowrap transition-colors">Flashcards</button>
+        <button data-nav="blueprint" class="nav-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium whitespace-nowrap transition-colors">Blueprint</button>
+        <button id="btn-reset-open" class="ml-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-500 hover:text-rose-600 hover:bg-rose-50 whitespace-nowrap transition-colors" title="Reset local progress">Reset</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6">
+    <!-- Dashboard View -->
+    <section id="view-dashboard" class="space-y-6"></section>
+
+    <!-- Active Quiz View -->
+    <section id="view-quiz" class="hidden space-y-5"></section>
+
+    <!-- Results View -->
+    <section id="view-results" class="hidden space-y-6"></section>
+
+    <!-- Flashcards View -->
+    <section id="view-flashcards" class="hidden space-y-6"></section>
+
+    <!-- Blueprint View -->
+    <section id="view-blueprint" class="hidden space-y-6"></section>
+  </main>
+
+  <!-- In-page Confirmation / Info Modal -->
+  <div id="modal-backdrop" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 space-y-4 border border-slate-200">
+      <h3 id="modal-title" class="text-lg font-bold text-slate-900">Confirm Action</h3>
+      <p id="modal-body" class="text-sm text-slate-600 leading-relaxed"></p>
+      <div class="flex items-center justify-end gap-2.5 pt-2">
+        <button id="modal-cancel" class="px-4 py-2 rounded-xl text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors">Cancel</button>
+        <button id="modal-confirm" class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="hidden fixed bottom-5 right-5 z-50 bg-slate-900 text-white text-sm font-medium px-4 py-2.5 rounded-xl shadow-lg transition-opacity"></div>
+
+  <script>
+    // =========================================================================
+    // 1. GROUNDED KSEAB 2026-27 SYLLABUS & BLUEPRINT DATA (SUBJECT 34)
+    // =========================================================================
+    const CHAPTERS = [
+      { id: 1, name: 'Solutions', branch: 'Physical', hours: 14, marks: 12 },
+      { id: 2, name: 'Electrochemistry', branch: 'Physical', hours: 14, marks: 13 },
+      { id: 3, name: 'Chemical Kinetics', branch: 'Physical', hours: 14, marks: 12 },
+      { id: 4, name: 'The d- and f-Block Elements', branch: 'Inorganic', hours: 12, marks: 10 },
+      { id: 5, name: 'Coordination Compounds', branch: 'Inorganic', hours: 12, marks: 11 },
+      { id: 6, name: 'Haloalkanes and Haloarenes', branch: 'Organic', hours: 10, marks: 9 },
+      { id: 7, name: 'Alcohols, Phenols and Ethers', branch: 'Organic', hours: 12, marks: 10 },
+      { id: 8, name: 'Aldehydes, Ketones and Carboxylic Acids', branch: 'Organic', hours: 14, marks: 12 },
+      { id: 9, name: 'Amines', branch: 'Organic', hours: 8, marks: 7 },
+      { id: 10, name: 'Biomolecules', branch: 'Organic', hours: 10, marks: 9 }
+    ];
+
+    const PAPER_PATTERN = [
+      { part: 'Part A', structure: '15 MCQs + 5 Fill-in-the-Blanks (all compulsory)', marksEach: 1, totalMarks: 20 },
+      { part: 'Part B', structure: 'Answer any 3 out of 5 questions', marksEach: 2, totalMarks: 6 },
+      { part: 'Part C', structure: 'Answer 3 of 5 + 2 of 4 questions', marksEach: 3, totalMarks: 15 },
+      { part: 'Part D', structure: 'Answer 4 out of 6 questions (all Organic chapters)', marksEach: 5, totalMarks: 20 },
+      { part: 'Part E', structure: 'Numerical problems: answer 3 out of 6 (Physical)', marksEach: 3, totalMarks: 9 }
+    ];
+
+    const DELETED_CHAPTERS = [
+      'The Solid State',
+      'Surface Chemistry',
+      'General Principles & Processes of Isolation of Elements',
+      'The p-Block Elements',
+      'Polymers',
+      'Chemistry in Everyday Life'
+    ];
+
+    // =========================================================================
+    // 2. QUESTION BANK (50 QUESTIONS: 4 MCQs + 1 FIB PER CHAPTER)
+    // =========================================================================
+    const QUESTIONS = [
+      // Chapter 1: Solutions
+      {
+        id: 'c1_q1', chapterId: 1, type: 'mcq',
+        prompt: 'Which of the following concentration terms is independent of temperature?',
+        options: ['Molarity (M)', 'Molality (m)', 'Normality (N)', 'Percentage by volume (v/V)'],
+        answer: 1,
+        explanation: 'Molality (m) = moles of solute / mass of solvent in kg. Since mass does not change with temperature, molality is temperature-independent.'
+      },
+      {
+        id: 'c1_q2', chapterId: 1, type: 'mcq',
+        prompt: 'A mixture of 95.5% ethanol and 4.5% water by mass forms a minimum-boiling azeotrope because it shows:',
+        options: ['Ideal behaviour', 'Negative deviation from Raoult’s law', 'Positive deviation from Raoult’s law', 'Zero enthalpy of mixing'],
+        answer: 2,
+        explanation: 'Ethanol–water exhibits positive deviation from Raoult’s law (weaker A–B interactions than A–A and B–B), producing a minimum-boiling azeotrope.'
+      },
+      {
+        id: 'c1_q3', chapterId: 1, type: 'mcq',
+        prompt: 'Assuming complete dissociation, the van ’t Hoff factor (i) for K<sub>2</sub>SO<sub>4</sub> in dilute aqueous solution is:',
+        options: ['1', '2', '3', '4'],
+        answer: 2,
+        explanation: 'K<sub>2</sub>SO<sub>4</sub> dissociates as 2K<sup>+</sup> + SO<sub>4</sub><sup>2−</sup>, producing 3 ions per formula unit (i = 3).'
+      },
+      {
+        id: 'c1_q4', chapterId: 1, type: 'mcq',
+        prompt: 'According to Henry’s law (p = K<sub>H</sub>x), a gas with a higher K<sub>H</sub> value at a given pressure and temperature has:',
+        options: ['Higher solubility in the liquid', 'Lower solubility in the liquid', 'Zero vapour pressure', 'Higher boiling point'],
+        answer: 1,
+        explanation: 'Since p = K<sub>H</sub>x, at constant partial pressure p, mole fraction x = p / K<sub>H</sub>. Thus higher K<sub>H</sub> means lower solubility.'
+      },
+      {
+        id: 'c1_q5', chapterId: 1, type: 'fib',
+        prompt: 'Two solutions having the same ______ at a given temperature are called isotonic solutions.',
+        accepted: ['osmotic pressure'],
+        hints: ['osmotic pressure', 'vapour pressure', 'boiling point', 'molality'],
+        explanation: 'Isotonic solutions exert equal osmotic pressure (π<sub>1</sub> = π<sub>2</sub>) at the same temperature, so no net osmosis occurs across a semipermeable membrane.'
+      },
+
+      // Chapter 2: Electrochemistry
+      {
+        id: 'c2_q1', chapterId: 2, type: 'mcq',
+        prompt: 'The SI unit of molar conductivity (Λ<sub>m</sub>) is:',
+        options: ['S m<sup>−1</sup>', 'S m<sup>2</sup> mol<sup>−1</sup>', 'S cm<sup>2</sup> mol<sup>−1</sup>', 'Ω<sup>−1</sup> m<sup>−1</sup>'],
+        answer: 1,
+        explanation: 'Λ<sub>m</sub> = κ / c. In SI units, κ is in S m<sup>−1</sup> and concentration c is in mol m<sup>−3</sup>, giving S m<sup>2</sup> mol<sup>−1</sup>.'
+      },
+      {
+        id: 'c2_q2', chapterId: 2, type: 'mcq',
+        prompt: 'During the electrolysis of concentrated aqueous NaCl using inert platinum electrodes, the product liberated at the anode is:',
+        options: ['H<sub>2</sub> gas', 'O<sub>2</sub> gas', 'Cl<sub>2</sub> gas', 'Sodium metal'],
+        answer: 2,
+        explanation: 'Due to overpotential of oxygen at the anode, oxidation of Cl<sup>−</sup> ions is preferred: 2Cl<sup>−</sup> → Cl<sub>2</sub>(g) + 2e<sup>−</sup>.'
+      },
+      {
+        id: 'c2_q3', chapterId: 2, type: 'mcq',
+        prompt: 'In the Nernst equation at 298 K, the constant term (2.303 RT / F) is equal to:',
+        options: ['0.0295 V', '0.059 V', '0.591 V', '1.10 V'],
+        answer: 1,
+        explanation: 'At T = 298 K, R = 8.314 J K<sup>−1</sup> mol<sup>−1</sup>, and F = 96487 C mol<sup>−1</sup>, (2.303 RT / F) ≈ 0.059 V.'
+      },
+      {
+        id: 'c2_q4', chapterId: 2, type: 'mcq',
+        prompt: 'Which electrolyte is used in a mercury cell (used in hearing aids and watches)?',
+        options: ['38% H<sub>2</sub>SO<sub>4</sub>', 'Paste of NH<sub>4</sub>Cl and ZnCl<sub>2</sub>', 'Paste of KOH and ZnO', 'Molten NaCl'],
+        answer: 2,
+        explanation: 'A mercury cell uses a zinc-mercury amalgam anode, a paste of HgO and carbon cathode, and a paste of KOH and ZnO as electrolyte.'
+      },
+      {
+        id: 'c2_q5', chapterId: 2, type: 'fib',
+        prompt: 'According to Faraday’s first law of electrolysis, the mass of a substance deposited at an electrode is directly proportional to the ______ passed through the electrolyte.',
+        accepted: ['quantity of electricity', 'charge', 'electricity'],
+        hints: ['quantity of electricity', 'voltage', 'resistance', 'molarity'],
+        explanation: 'Faraday’s first law states m ∝ Q (or m = ZIt), where Q is the quantity of electricity (electric charge) passed.'
+      },
+
+      // Chapter 3: Chemical Kinetics
+      {
+        id: 'c3_q1', chapterId: 3, type: 'mcq',
+        prompt: 'What is the unit of the rate constant (k) for a first-order reaction?',
+        options: ['mol L<sup>−1</sup> s<sup>−1</sup>', 's<sup>−1</sup>', 'L mol<sup>−1</sup> s<sup>−1</sup>', 'L<sup>2</sup> mol<sup>−2</sup> s<sup>−1</sup>'],
+        answer: 1,
+        explanation: 'For an n<sup>th</sup>-order reaction, unit of k is (mol L<sup>−1</sup>)<sup>1−n</sup> s<sup>−1</sup>. For n = 1, the unit is s<sup>−1</sup>.'
+      },
+      {
+        id: 'c3_q2', chapterId: 3, type: 'mcq',
+        prompt: 'The half-life period (t<sub>1/2</sub>) of a first-order reaction is:',
+        options: ['Directly proportional to initial concentration [R]<sub>0</sub>', 'Inversely proportional to [R]<sub>0</sub>', 'Independent of [R]<sub>0</sub>', 'Proportional to [R]<sub>0</sub><sup>2</sup>'],
+        answer: 2,
+        explanation: 'For a first-order reaction, t<sub>1/2</sub> = 0.693 / k, which does not depend on the initial concentration [R]<sub>0</sub>.'
+      },
+      {
+        id: 'c3_q3', chapterId: 3, type: 'mcq',
+        prompt: 'Acid-catalysed hydrolysis of ethyl acetate (CH<sub>3</sub>COOC<sub>2</sub>H<sub>5</sub> + H<sub>2</sub>O → CH<sub>3</sub>COOH + C<sub>2</sub>H<sub>5</sub>OH) is an example of a:',
+        options: ['Zero-order reaction', 'Pseudo first-order reaction', 'Second-order reaction', 'Third-order reaction'],
+        answer: 1,
+        explanation: 'Water is present in large excess so its concentration remains practically constant; hence the bimolecular reaction follows first-order kinetics.'
+      },
+      {
+        id: 'c3_q4', chapterId: 3, type: 'mcq',
+        prompt: 'In the Arrhenius equation k = A e<sup>−E<sub>a</sub>/RT</sup>, the slope of the linear plot of ln k versus 1/T is:',
+        options: ['E<sub>a</sub> / R', '−E<sub>a</sub> / R', '−E<sub>a</sub> / (2.303 R)', 'ln A'],
+        answer: 1,
+        explanation: 'Taking natural log gives ln k = (−E<sub>a</sub>/R)(1/T) + ln A, which is a straight line with slope = −E<sub>a</sub>/R.'
+      },
+      {
+        id: 'c3_q5', chapterId: 3, type: 'fib',
+        prompt: 'The minimum extra energy that reactant molecules must acquire to cross the energy barrier and form products is called ______.',
+        accepted: ['activation energy'],
+        hints: ['activation energy', 'threshold energy', 'enthalpy', 'kinetic energy'],
+        explanation: 'Activation energy (E<sub>a</sub>) = Threshold energy − Average energy of reactant molecules.'
+      },
+
+      // Chapter 4: The d- and f-Block Elements
+      {
+        id: 'c4_q1', chapterId: 4, type: 'mcq',
+        prompt: 'Which 3d-series transition element exhibits the highest oxidation state (+7)?',
+        options: ['Chromium (Cr)', 'Manganese (Mn)', 'Iron (Fe)', 'Vanadium (V)'],
+        answer: 1,
+        explanation: 'Manganese (3d<sup>5</sup> 4s<sup>2</sup>) uses all 7 valence electrons to show a maximum oxidation state of +7, as in KMnO<sub>4</sub>.'
+      },
+      {
+        id: 'c4_q2', chapterId: 4, type: 'mcq',
+        prompt: 'Calculate the spin-only magnetic moment of Fe<sup>2+</sup> ion (Z = 26):',
+        options: ['1.73 BM', '3.87 BM', '4.90 BM', '5.92 BM'],
+        answer: 2,
+        explanation: 'Fe<sup>2+</sup> has configuration [Ar] 3d<sup>6</sup> with 4 unpaired electrons (n = 4). μ = √(4 × 6) = √24 ≈ 4.90 BM.'
+      },
+      {
+        id: 'c4_q3', chapterId: 4, type: 'mcq',
+        prompt: 'Lanthanoid contraction is primarily caused by:',
+        options: ['High nuclear charge alone', 'Poor shielding effect of 4f electrons', 'Strong shielding by 5d electrons', 'Large atomic mass of lanthanoids'],
+        answer: 1,
+        explanation: 'The 4f orbitals are diffused and offer very poor shielding against increasing nuclear charge, causing a steady decrease in atomic/ionic radii.'
+      },
+      {
+        id: 'c4_q4', chapterId: 4, type: 'mcq',
+        prompt: 'The intense purple colour of KMnO<sub>4</sub> is due to:',
+        options: ['d–d transition of Mn<sup>7+</sup>', 'Charge transfer (ligand to metal)', 'f–f transition', 'Presence of unpaired 3d electrons'],
+        answer: 1,
+        explanation: 'Mn in MnO<sub>4</sub><sup>−</sup> is in +7 state (3d<sup>0</sup>). The colour arises from ligand-to-metal charge transfer (O<sup>2−</sup> → Mn<sup>7+</sup>).'
+      },
+      {
+        id: 'c4_q5', chapterId: 4, type: 'fib',
+        prompt: 'The element in the 4d series with completely filled d-orbitals in its ground state [Kr]4d<sup>10</sup>5s<sup>0</sup> is ______.',
+        accepted: ['palladium', 'pd'],
+        hints: ['palladium', 'silver', 'cadmium', 'rhodium'],
+        explanation: 'Palladium (Z = 46) has the exceptional ground-state electronic configuration [Kr] 4d<sup>10</sup> 5s<sup>0</sup>.'
+      },
+
+      // Chapter 5: Coordination Compounds
+      {
+        id: 'c5_q1', chapterId: 5, type: 'mcq',
+        prompt: 'What is the coordination number of cobalt in [Co(en)<sub>3</sub>]Cl<sub>3</sub>?',
+        options: ['3', '4', '6', '9'],
+        answer: 2,
+        explanation: 'Ethylenediamine (en) is a bidentate ligand. Three `en` ligands form 3 × 2 = 6 coordinate bonds with Co<sup>3+</sup>.'
+      },
+      {
+        id: 'c5_q2', chapterId: 5, type: 'mcq',
+        prompt: 'Which of the following is an ambidentate ligand?',
+        options: ['NH<sub>3</sub>', 'H<sub>2</sub>O', 'SCN<sup>−</sup>', 'C<sub>2</sub>O<sub>4</sub><sup>2−</sup>'],
+        answer: 2,
+        explanation: 'SCN<sup>−</sup> can coordinate through either the S atom (thiocyanato-S) or the N atom (thiocyanato-N), making it ambidentate.'
+      },
+      {
+        id: 'c5_q3', chapterId: 5, type: 'mcq',
+        prompt: 'The IUPAC name of K<sub>4</sub>[Fe(CN)<sub>6</sub>] is:',
+        options: [
+          'Potassium hexacyanidoferrate(II)',
+          'Potassium hexacyanidoferrate(III)',
+          'Tetrapotassium hexacyanoiron(II)',
+          'Potassium hexacyanidoiron(II)'
+        ],
+        answer: 0,
+        explanation: 'Fe has oxidation state +2 (+4 + x − 6 = 0 → x = +2). Anionic complex ends in -ferrate(II), so Potassium hexacyanidoferrate(II).'
+      },
+      {
+        id: 'c5_q4', chapterId: 5, type: 'mcq',
+        prompt: 'For an octahedral complex with a strong-field ligand (low-spin complex), the relationship between Δ<sub>o</sub> and pairing energy P is:',
+        options: ['Δ<sub>o</sub> < P', 'Δ<sub>o</sub> > P', 'Δ<sub>o</sub> = 0', 'Δ<sub>o</sub> = P/2'],
+        answer: 1,
+        explanation: 'When Δ<sub>o</sub> > P, it is energetically favourable for electrons to pair in the lower t<sub>2g</sub> orbitals rather than occupy e<sub>g</sub> orbitals.'
+      },
+      {
+        id: 'c5_q5', chapterId: 5, type: 'fib',
+        prompt: 'The cis-isomer of [Pt(NH<sub>3</sub>)<sub>2</sub>Cl<sub>2</sub>], used effectively in the treatment of tumours, is commonly called ______.',
+        accepted: ['cisplatin'],
+        hints: ['cisplatin', 'transplatin', 'EDTA', 'ferrocene'],
+        explanation: 'Cisplatin, cis-[Pt(NH<sub>3</sub>)<sub>2</sub>Cl<sub>2</sub>], is a widely used coordination compound in cancer chemotherapy.'
+      },
+
+      // Chapter 6: Haloalkanes and Haloarenes
+      {
+        id: 'c6_q1', chapterId: 6, type: 'mcq',
+        prompt: 'Which nucleophilic substitution mechanism proceeds with complete inversion of configuration (Walden inversion)?',
+        options: ['S<sub>N</sub>1', 'S<sub>N</sub>2', 'E1', 'Free radical substitution'],
+        answer: 1,
+        explanation: 'In S<sub>N</sub>2, the nucleophile attacks from the backside (180° to the leaving group) in a concerted single step, causing inversion of configuration.'
+      },
+      {
+        id: 'c6_q2', chapterId: 6, type: 'mcq',
+        prompt: 'Chlorobenzene reacts with methyl chloride and sodium in dry ether to form toluene. This reaction is known as:',
+        options: ['Wurtz reaction', 'Fittig reaction', 'Wurtz-Fittig reaction', 'Friedel-Crafts reaction'],
+        answer: 2,
+        explanation: 'Coupling of an aryl halide (chlorobenzene) and an alkyl halide (CH<sub>3</sub>Cl) with Na in dry ether is the Wurtz-Fittig reaction.'
+      },
+      {
+        id: 'c6_q3', chapterId: 6, type: 'mcq',
+        prompt: 'Which of the following halides undergoes S<sub>N</sub>1 reaction fastest?',
+        options: ['CH<sub>3</sub>Br', 'CH<sub>3</sub>CH<sub>2</sub>Br', '(CH<sub>3</sub>)<sub>2</sub>CHBr', '(CH<sub>3</sub>)<sub>3</sub>CBr'],
+        answer: 3,
+        explanation: 'S<sub>N</sub>1 rate depends on carbocation stability: 3° carbocation (CH<sub>3</sub>)<sub>3</sub>C<sup>+</sup> is most stable, so (CH<sub>3</sub>)<sub>3</sub>CBr reacts fastest.'
+      },
+      {
+        id: 'c6_q4', chapterId: 6, type: 'mcq',
+        prompt: 'Chloroform (CHCl<sub>3</sub>) on slow oxidation by air in the presence of light forms a poisonous gas called:',
+        options: ['Phosphine', 'Phosgene', 'Mustard gas', 'Carbon monoxide'],
+        answer: 1,
+        explanation: '2CHCl<sub>3</sub> + O<sub>2</sub> —(light)→ 2COCl<sub>2</sub> (phosgene) + 2HCl. Hence chloroform is stored in dark-coloured bottles filled to the brim.'
+      },
+      {
+        id: 'c6_q5', chapterId: 6, type: 'fib',
+        prompt: 'Heating an alkyl chloride or bromide with NaI in dry acetone to prepare alkyl iodides is called the ______ reaction.',
+        accepted: ['finkelstein', 'finkelstein reaction'],
+        hints: ['Finkelstein', 'Swarts', 'Sandmeyer', 'Gattermann'],
+        explanation: 'The Finkelstein reaction exchanges Cl/Br for I using NaI in dry acetone, where NaCl/NaBr precipitates out.'
+      },
+
+      // Chapter 7: Alcohols, Phenols and Ethers
+      {
+        id: 'c7_q1', chapterId: 7, type: 'mcq',
+        prompt: 'Which reagent is used to distinguish primary, secondary, and tertiary alcohols based on the rate of turbidity formation?',
+        options: ['Tollens’ reagent', 'Fehling’s solution', 'Lucas reagent', 'Hinsberg’s reagent'],
+        answer: 2,
+        explanation: 'Lucas reagent (conc. HCl + anhydrous ZnCl<sub>2</sub>) gives immediate turbidity with 3° alcohols, turbidity in ~5 min with 2°, and none at room temperature with 1°.'
+      },
+      {
+        id: 'c7_q2', chapterId: 7, type: 'mcq',
+        prompt: 'Phenol reacts with CHCl<sub>3</sub> and aqueous NaOH at 340 K, followed by acidification, to give salicylaldehyde. This is:',
+        options: ['Kolbe’s reaction', 'Reimer-Tiemann reaction', 'Williamson synthesis', 'Etard reaction'],
+        answer: 1,
+        explanation: 'Reimer-Tiemann reaction introduces a −CHO group ortho to the −OH group of phenol using CHCl<sub>3</sub> and NaOH.'
+      },
+      {
+        id: 'c7_q3', chapterId: 7, type: 'mcq',
+        prompt: 'Williamson synthesis is a laboratory method for preparing:',
+        options: ['Symmetrical and unsymmetrical ethers', 'Only aldehydes', 'Carboxylic acids', 'Primary amines'],
+        answer: 0,
+        explanation: 'Williamson synthesis reacts an alkyl halide with sodium alkoxide (R−X + R’−ONa → R−O−R’ + NaX) via S<sub>N</sub>2 to form ethers.'
+      },
+      {
+        id: 'c7_q4', chapterId: 7, type: 'mcq',
+        prompt: 'Arrange ethanol, phenol, and water in decreasing order of acidic strength:',
+        options: ['Ethanol > Water > Phenol', 'Phenol > Water > Ethanol', 'Water > Phenol > Ethanol', 'Phenol > Ethanol > Water'],
+        answer: 1,
+        explanation: 'Phenoxide ion is resonance-stabilised (strongest acid). Ethanol is weaker than water due to the +I effect of the ethyl group.'
+      },
+      {
+        id: 'c7_q5', chapterId: 7, type: 'fib',
+        prompt: 'When phenol is heated with zinc dust, it is reduced to ______.',
+        accepted: ['benzene'],
+        hints: ['benzene', 'toluene', 'cyclohexanol', 'anisole'],
+        explanation: 'C<sub>6</sub>H<sub>5</sub>OH + Zn —(Δ)→ C<sub>6</sub>H<sub>6</sub> (benzene) + ZnO.'
+      },
+
+      // Chapter 8: Aldehydes, Ketones and Carboxylic Acids
+      {
+        id: 'c8_q1', chapterId: 8, type: 'mcq',
+        prompt: 'Aldehydes lacking an α-hydrogen atom undergo self-oxidation and reduction on heating with concentrated alkali. This is:',
+        options: ['Aldol condensation', 'Cannizzaro reaction', 'Clemmensen reduction', 'Perkin reaction'],
+        answer: 1,
+        explanation: 'Formaldehyde (HCHO) and benzaldehyde (C<sub>6</sub>H<sub>5</sub>CHO) lack α-H and undergo disproportionation (Cannizzaro reaction) into an alcohol and a carboxylate salt.'
+      },
+      {
+        id: 'c8_q2', chapterId: 8, type: 'mcq',
+        prompt: 'Which test distinguishes aldehydes from ketones by producing a bright silver mirror on the inner wall of the test tube?',
+        options: ['Iodoform test', 'Tollens’ test', 'Lucas test', 'Carbylamine test'],
+        answer: 1,
+        explanation: 'Tollens’ reagent (ammoniacal AgNO<sub>3</sub>) is reduced by aldehydes to metallic silver (Ag), whereas ketones do not react.'
+      },
+      {
+        id: 'c8_q3', chapterId: 8, type: 'mcq',
+        prompt: 'Hydrogenation of an acyl chloride (RCOCl) over Pd supported on BaSO<sub>4</sub> to give an aldehyde is called:',
+        options: ['Stephen reaction', 'Rosenmund reduction', 'Wolff-Kishner reduction', 'Gattermann-Koch reaction'],
+        answer: 1,
+        explanation: 'Rosenmund reduction uses H<sub>2</sub>/Pd-BaSO<sub>4</sub> (partially poisoned catalyst) to stop reduction at the aldehyde stage.'
+      },
+      {
+        id: 'c8_q4', chapterId: 8, type: 'mcq',
+        prompt: 'The Hell-Volhard-Zelinsky (HVZ) reaction substitutes a halogen (Cl or Br) at which carbon of a carboxylic acid?',
+        options: ['Carbonyl carbon', 'α-carbon', 'β-carbon', 'γ-carbon'],
+        answer: 1,
+        explanation: 'Carboxylic acids with an α-hydrogen react with Cl<sub>2</sub>/Br<sub>2</sub> in presence of red phosphorus to give α-halocarboxylic acids.'
+      },
+      {
+        id: 'c8_q5', chapterId: 8, type: 'fib',
+        prompt: 'Reduction of aldehydes or ketones to alkanes using zinc amalgam (Zn-Hg) and concentrated HCl is called ______ reduction.',
+        accepted: ['clemmensen', 'clemmensen reduction'],
+        hints: ['Clemmensen', 'Wolff-Kishner', 'Rosenmund', 'Stephen'],
+        explanation: 'Clemmensen reduction converts >C=O to >CH<sub>2</sub> using Zn-Hg / conc. HCl.'
+      },
+
+      // Chapter 9: Amines
+      {
+        id: 'c9_q1', chapterId: 9, type: 'mcq',
+        prompt: 'Which reaction converts a primary amide (RCONH<sub>2</sub>) into a primary amine (RNH<sub>2</sub>) with one carbon atom less?',
+        options: ['Gabriel phthalimide synthesis', 'Hoffmann bromamide degradation', 'Sandmeyer reaction', 'Coupling reaction'],
+        answer: 1,
+        explanation: 'RCONH<sub>2</sub> + Br<sub>2</sub> + 4NaOH → RNH<sub>2</sub> + Na<sub>2</sub>CO<sub>3</sub> + 2NaBr + 2H<sub>2</sub>O.'
+      },
+      {
+        id: 'c9_q2', chapterId: 9, type: 'mcq',
+        prompt: 'The carbylamine test (heating with CHCl<sub>3</sub> and alcoholic KOH to form foul-smelling isocyanide) is given by:',
+        options: ['Only primary amines', 'Only secondary amines', 'Only tertiary amines', 'All aliphatic amines'],
+        answer: 0,
+        explanation: 'Only primary amines (both aliphatic and aromatic) respond to the carbylamine test; 2° and 3° amines do not.'
+      },
+      {
+        id: 'c9_q3', chapterId: 9, type: 'mcq',
+        prompt: 'In aqueous solution, the correct decreasing order of basic strength of methyl-substituted amines is:',
+        options: [
+          '(CH<sub>3</sub>)<sub>3</sub>N > (CH<sub>3</sub>)<sub>2</sub>NH > CH<sub>3</sub>NH<sub>2</sub>',
+          '(CH<sub>3</sub>)<sub>2</sub>NH > CH<sub>3</sub>NH<sub>2</sub> > (CH<sub>3</sub>)<sub>3</sub>N',
+          'CH<sub>3</sub>NH<sub>2</sub> > (CH<sub>3</sub>)<sub>2</sub>NH > (CH<sub>3</sub>)<sub>3</sub>N',
+          '(CH<sub>3</sub>)<sub>2</sub>NH > (CH<sub>3</sub>)<sub>3</sub>N > CH<sub>3</sub>NH<sub>2</sub>'
+        ],
+        answer: 1,
+        explanation: 'Due to combined inductive effect, solvation (H-bonding), and steric hindrance, (CH<sub>3</sub>)<sub>2</sub>NH > CH<sub>3</sub>NH<sub>2</sub> > (CH<sub>3</sub>)<sub>3</sub>N > NH<sub>3</sub> in water.'
+      },
+      {
+        id: 'c9_q4', chapterId: 9, type: 'mcq',
+        prompt: 'Reaction of benzene diazonium chloride with Cu<sub>2</sub>Cl<sub>2</sub>/HCl to form chlorobenzene is called:',
+        options: ['Sandmeyer reaction', 'Gattermann reaction', 'Balz-Schiemann reaction', 'Etard reaction'],
+        answer: 0,
+        explanation: 'Replacing the diazonium group (−N<sub>2</sub><sup>+</sup>Cl<sup>−</sup>) with −Cl, −Br, or −CN using Cu(I) salts is the Sandmeyer reaction.'
+      },
+      {
+        id: 'c9_q5', chapterId: 9, type: 'fib',
+        prompt: 'Hinsberg’s reagent, used to distinguish 1°, 2°, and 3° amines, is chemically ______.',
+        accepted: ['benzenesulphonyl chloride', 'benzene sulphonyl chloride', 'benzenesulfonyl chloride', 'c6h5so2cl'],
+        hints: ['benzenesulphonyl chloride', 'acetyl chloride', 'benzyl chloride', 'thionyl chloride'],
+        explanation: 'Benzenesulphonyl chloride (C<sub>6</sub>H<sub>5</sub>SO<sub>2</sub>Cl) forms an alkali-soluble sulphonamide with 1° amines, alkali-insoluble with 2° amines, and does not react with 3° amines.'
+      },
+
+      // Chapter 10: Biomolecules
+      {
+        id: 'c10_q1', chapterId: 10, type: 'mcq',
+        prompt: 'Which of the following carbohydrates is a non-reducing sugar?',
+        options: ['Glucose', 'Maltose', 'Lactose', 'Sucrose'],
+        answer: 3,
+        explanation: 'In sucrose, the reducing groups of glucose (C1) and fructose (C2) are involved in the glycosidic bond, so it cannot reduce Tollens’ or Fehling’s reagent.'
+      },
+      {
+        id: 'c10_q2', chapterId: 10, type: 'mcq',
+        prompt: 'Two monosaccharide units in a disaccharide are joined together by an oxide linkage called:',
+        options: ['Peptide linkage', 'Glycosidic linkage', 'Phosphodiester linkage', 'Hydrogen bond'],
+        answer: 1,
+        explanation: 'Monosaccharides are joined through an oxygen atom (C–O–C) formed by loss of water, known as a glycosidic linkage.'
+      },
+      {
+        id: 'c10_q3', chapterId: 10, type: 'mcq',
+        prompt: 'Deficiency of Vitamin C (ascorbic acid) in the human diet causes:',
+        options: ['Rickets', 'Beri-beri', 'Scurvy', 'Night blindness'],
+        answer: 2,
+        explanation: 'Vitamin C (ascorbic acid) deficiency causes scurvy (bleeding gums).'
+      },
+      {
+        id: 'c10_q4', chapterId: 10, type: 'mcq',
+        prompt: 'Which nitrogenous base is present in RNA but absent in DNA?',
+        options: ['Adenine', 'Guanine', 'Cytosine', 'Uracil'],
+        answer: 3,
+        explanation: 'DNA contains A, G, C, and Thymine (T), whereas RNA contains A, G, C, and Uracil (U).'
+      },
+      {
+        id: 'c10_q5', chapterId: 10, type: 'fib',
+        prompt: 'Proteins are polymers of α-amino acids connected to each other by ______ bonds (−CONH−).',
+        accepted: ['peptide', 'amide'],
+        hints: ['peptide', 'glycosidic', 'ester', 'ionic'],
+        explanation: 'A peptide bond (−CO−NH−) is formed between the −COOH group of one amino acid and the −NH<sub>2</sub> group of another.'
+      }
+    ];
+
+    // =========================================================================
+    // 3. FLASHCARDS DECK (20 HIGH-YIELD CARDS: 2 PER CHAPTER)
+    // =========================================================================
+    const FLASHCARDS = [
+      { id: 'f1', chapterId: 1, front: 'Raoult’s Law for Volatile Liquids', back: 'p<sub>total</sub> = p<sub>1</sub>°x<sub>1</sub> + p<sub>2</sub>°x<sub>2</sub>. Ideal solutions obey this at all concentrations and have ΔH<sub>mix</sub> = 0, ΔV<sub>mix</sub> = 0.' },
+      { id: 'f2', chapterId: 1, front: 'Colligative Properties Formulae', back: 'ΔT<sub>b</sub> = i·K<sub>b</sub>·m | ΔT<sub>f</sub> = i·K<sub>f</sub>·m | π = i·C·R·T. All depend only on the number of solute particles.' },
+      { id: 'f3', chapterId: 2, front: 'Nernst Equation (at 298 K)', back: 'E<sub>cell</sub> = E°<sub>cell</sub> − (0.059 / n) log([Products]/[Reactants]). At equilibrium, E<sub>cell</sub> = 0 and ΔG° = −nFE°<sub>cell</sub>.' },
+      { id: 'f4', chapterId: 2, front: 'Kohlrausch’s Law of Independent Migration', back: 'Λ°<sub>m</sub> = ν<sub>+</sub>λ°<sub>+</sub> + ν<sub>−</sub>λ°<sub>−</sub>. Used to find Λ°<sub>m</sub> and degree of dissociation (α = Λ<sub>m</sub>/Λ°<sub>m</sub>) of weak electrolytes.' },
+      { id: 'f5', chapterId: 3, front: 'Zero & First Order Integrated Rate Laws', back: 'Zero order: k = ([R]<sub>0</sub> − [R])/t, t<sub>1/2</sub> = [R]<sub>0</sub>/2k. First order: k = (2.303/t) log([R]<sub>0</sub>/[R]), t<sub>1/2</sub> = 0.693/k.' },
+      { id: 'f6', chapterId: 3, front: 'Arrhenius Equation (Two Temperatures)', back: 'log(k<sub>2</sub>/k<sub>1</sub>) = (E<sub>a</sub> / 2.303R) · [(T<sub>2</sub> − T<sub>1</sub>)/(T<sub>1</sub>T<sub>2</sub>)].' },
+      { id: 'f7', chapterId: 4, front: 'Spin-Only Magnetic Moment', back: 'μ = √(n(n + 2)) BM, where n = number of unpaired electrons. Mn<sup>2+</sup> (n=5) has μ = 5.92 BM.' },
+      { id: 'f8', chapterId: 4, front: 'K<sub>2</sub>Cr<sub>2</sub>O<sub>7</sub> & KMnO<sub>4</sub> Oxidising Action', back: 'In acid: Cr<sub>2</sub>O<sub>7</sub><sup>2−</sup> → 2Cr<sup>3+</sup> (gain 6e<sup>−</sup>); MnO<sub>4</sub><sup>−</sup> → Mn<sup>2+</sup> (gain 5e<sup>−</sup>). In neutral/faintly alkaline: MnO<sub>4</sub><sup>−</sup> → MnO<sub>2</sub>.' },
+      { id: 'f9', chapterId: 5, front: 'Werner’s Theory: Primary vs Secondary Valency', back: 'Primary valency = ionisable (oxidation state). Secondary valency = non-ionisable (coordination number, directional).' },
+      { id: 'f10', chapterId: 5, front: 'Spectrochemical Series (Weak → Strong)', back: 'I<sup>−</sup> < Br<sup>−</sup> < Cl<sup>−</sup> < F<sup>−</sup> < OH<sup>−</sup> < C<sub>2</sub>O<sub>4</sub><sup>2−</sup> < H<sub>2</sub>O < NH<sub>3</sub> < en < CN<sup>−</sup> < CO.' },
+      { id: 'f11', chapterId: 6, front: 'S<sub>N</sub>1 vs S<sub>N</sub>2 Reactivity Order', back: 'S<sub>N</sub>1: 3° > 2° > 1° (racemisation, 2 steps). S<sub>N</sub>2: 1° > 2° > 3° (inversion, 1 step).' },
+      { id: 'f12', chapterId: 6, front: 'Swarts vs Finkelstein Reaction', back: 'Finkelstein: R−X + NaI (dry acetone) → R−I. Swarts: R−Cl/Br + AgF/Hg<sub>2</sub>F<sub>2</sub> → R−F.' },
+      { id: 'f13', chapterId: 7, front: 'Kolbe’s Reaction (Phenol → Salicylic Acid)', back: 'Phenol + NaOH → Sodium phenoxide + CO<sub>2</sub> (400 K, 4–7 atm) → H<sup>+</sup> → 2-hydroxybenzoic acid (salicylic acid).' },
+      { id: 'f14', chapterId: 7, front: 'Acid-Catalysed Dehydration of Ethanol (443 K vs 413 K)', back: 'With conc. H<sub>2</sub>SO<sub>4</sub>: at 443 K → Ethene (alkene); at 413 K → Ethoxyethane (ether).' },
+      { id: 'f15', chapterId: 8, front: 'Aldol vs Cannizzaro Reaction', back: 'Aldol: aldehydes/ketones WITH α-H + dil. NaOH → β-hydroxy aldehyde/ketone. Cannizzaro: aldehydes WITHOUT α-H + conc. NaOH → alcohol + acid salt.' },
+      { id: 'f16', chapterId: 8, front: 'Wolff-Kishner Reduction', back: 'Aldehyde/Ketone + NH<sub>2</sub>NH<sub>2</sub>, followed by heating with KOH in ethylene glycol → Alkane (>C=O → >CH<sub>2</sub>).' },
+      { id: 'f17', chapterId: 9, front: 'Gabriel Phthalimide Synthesis', back: 'Prepares pure aliphatic 1° amines (phthalimide + KOH + R−X → hydrolysis). Cannot prepare aromatic amines (aryl halides do not undergo S<sub>N</sub>2).' },
+      { id: 'f18', chapterId: 9, front: 'Coupling Reaction of Diazonium Salts', back: 'C<sub>6</sub>H<sub>5</sub>N<sub>2</sub><sup>+</sup>Cl<sup>−</sup> + Phenol (OH<sup>−</sup>) → p-hydroxyazobenzene (orange dye). With Aniline (H<sup>+</sup>) → p-aminoazobenzene (yellow dye).' },
+      { id: 'f19', chapterId: 10, front: 'Essential vs Non-Essential Amino Acids', back: 'Essential amino acids cannot be synthesised in the body and must be obtained through diet (e.g., Valine, Leucine, Lysine).' },
+      { id: 'f20', chapterId: 10, front: 'Denaturation of Proteins', back: 'Loss of biological activity due to disruption of 2° and 3° structures by heat or pH change; 1° structure (peptide bonds) remains intact.' }
+    ];
+
+    // =========================================================================
+    // 4. APPLICATION STATE & PERSISTENCE
+    // =========================================================================
+    const STORAGE_KEY = 'kseab_chem_quiz_v1';
+
+    function loadStats() {
+      const fallback = {
+        totalAnswered: 0,
+        totalCorrect: 0,
+        bestMockScore: null,
+        chapterStats: {}
+      };
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return fallback;
+        const parsed = JSON.parse(raw);
+        return { ...fallback, ...parsed, chapterStats: parsed.chapterStats || {} };
+      } catch (e) {
+        return fallback;
+      }
+    }
+
+    function saveStats() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state.stats));
+      } catch (e) {
+        // Ignore storage errors in restricted environments
+      }
+    }
+
+    const state = {
+      view: 'dashboard',
+      stats: loadStats(),
+      filters: {
+        branch: 'All',
+        chapterId: 'all',
+        count: 10,
+        qType: 'all'
+      },
+      quiz: null,
+      resultsFilter: 'all',
+      flashcards: {
+        chapterId: 'all',
+        index: 0,
+        flipped: false,
+        order: FLASHCARDS.map((_, i) => i),
+        known: new Set()
+      },
+      charts: {
+        results: null,
+        blueprint: null
+      }
+    };
+
+    // =========================================================================
+    // 5. UTILITY HELPERS
+    // =========================================================================
+    function getChapter(id) {
+      return CHAPTERS.find(c => c.id === id) || CHAPTERS[0];
+    }
+
+    function branchBadgeClass(branch) {
+      if (branch === 'Physical') return 'bg-sky-100 text-sky-800 border-sky-200';
+      if (branch === 'Inorganic') return 'bg-amber-100 text-amber-800 border-amber-200';
+      return 'bg-emerald-100 text-emerald-800 border-emerald-200';
+    }
+
+    function shuffleArray(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function normalizeText(str) {
+      return String(str || '').trim().toLowerCase().replace(/\s+/g, ' ');
+    }
+
+    function isQuestionCorrect(q, userAns) {
+      if (userAns === undefined || userAns === null || userAns === '') return false;
+      if (q.type === 'mcq') return Number(userAns) === q.answer;
+      const norm = normalizeText(userAns);
+      return q.accepted.some(acc => normalizeText(acc) === norm);
+    }
+
+    function formatTime(sec) {
+      const s = Math.max(0, Math.floor(sec));
+      const m = Math.floor(s / 60);
+      const r = s % 60;
+      return `${String(m).padStart(2, '0')}:${String(r).padStart(2, '0')}`;
+    }
+
+    let toastTimer = null;
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.remove('hidden');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.add('hidden'), 2600);
+    }
+
+    function openModal({ title, body, confirmText = 'Confirm', confirmClass = 'bg-indigo-600 hover:bg-indigo-700', onConfirm }) {
+      const backdrop = document.getElementById('modal-backdrop');
+      document.getElementById('modal-title').textContent = title;
+      document.getElementById('modal-body').textContent = body;
+      const confirmBtn = document.getElementById('modal-confirm');
+      confirmBtn.textContent = confirmText;
+      confirmBtn.className = `px-4 py-2 rounded-xl text-sm font-semibold text-white transition-colors ${confirmClass}`;
+
+      const cleanup = () => {
+        backdrop.classList.add('hidden');
+        confirmBtn.onclick = null;
+        document.getElementById('modal-cancel').onclick = null;
+      };
+
+      document.getElementById('modal-cancel').onclick = cleanup;
+      confirmBtn.onclick = () => {
+        cleanup();
+        if (onConfirm) onConfirm();
+      };
+      backdrop.classList.remove('hidden');
+    }
+
+    function stopQuizTimer() {
+      if (state.quiz && state.quiz.timerId) {
+        clearInterval(state.quiz.timerId);
+        state.quiz.timerId = null;
+      }
+    }
+
+    // =========================================================================
+    // 6. VIEW ROUTER
+    // =========================================================================
+    function switchView(viewName) {
+      if (state.view === 'quiz' && viewName !== 'quiz' && state.quiz && !state.quiz.submitted) {
+        openModal({
+          title: 'Leave active quiz?',
+          body: 'Your current quiz progress will be lost if you switch views without submitting.',
+          confirmText: 'Leave Quiz',
+          confirmClass: 'bg-rose-600 hover:bg-rose-700',
+          onConfirm: () => {
+            stopQuizTimer();
+            state.quiz = null;
+            applyView(viewName);
+          }
+        });
+        return;
+      }
+      applyView(viewName);
+    }
+
+    function applyView(viewName) {
+      state.view = viewName;
+      ['dashboard', 'quiz', 'results', 'flashcards', 'blueprint'].forEach(v => {
+        const el = document.getElementById(`view-${v}`);
+        if (v === viewName) el.classList.remove('hidden');
+        else el.classList.add('hidden');
+      });
+
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        const target = btn.getAttribute('data-nav');
+        const active = target === viewName || (viewName === 'results' && target === 'dashboard');
+        btn.className = active
+          ? 'nav-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold whitespace-nowrap bg-indigo-50 text-indigo-700'
+          : 'nav-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium whitespace-nowrap text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors';
+      });
+
+      if (viewName === 'dashboard') renderDashboard();
+      else if (viewName === 'quiz') renderQuiz();
+      else if (viewName === 'results') renderResults();
+      else if (viewName === 'flashcards') renderFlashcards();
+      else if (viewName === 'blueprint') renderBlueprint();
+    }
+
+    // =========================================================================
+    // 7. DASHBOARD VIEW
+    // =========================================================================
+    function renderDashboard() {
+      const container = document.getElementById('view-dashboard');
+      const { totalAnswered, totalCorrect, bestMockScore, chapterStats } = state.stats;
+      const overallAcc = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0;
+      const masteredCount = CHAPTERS.filter(c => {
+        const st = chapterStats[c.id];
+        return st && st.attempted >= 3 && (st.correct / st.attempted) >= 0.7;
+      }).length;
+
+      const filteredChapters = state.filters.branch === 'All'
+        ? CHAPTERS
+        : CHAPTERS.filter(c => c.branch === state.filters.branch);
+
+      container.innerHTML = `
+        <!-- Hero Banner -->
+        <div class="bg-gradient-to-br from-indigo-700 via-indigo-600 to-violet-600 rounded-2xl p-6 sm:p-7 text-white shadow-sm flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
+          <div class="space-y-2 max-w-2xl">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-white/15 text-indigo-50">
+              KSEAB 2026–27 Syllabus · 10 Chapters · 70 Marks Theory
+            </span>
+            <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Master 2nd PUC Chemistry</h2>
+            <p class="text-sm sm:text-base text-indigo-100">
+              Practice chapter-wise MCQs, fill-in-the-blanks, and timed Part A Mock Tests aligned to the official KSEAB blueprint.
+            </p>
+          </div>
+          <div class="flex flex-wrap gap-3 shrink-0">
+            <button id="btn-start-mock" class="px-5 py-3 rounded-xl bg-white text-indigo-700 font-bold text-sm shadow-sm hover:bg-indigo-50 transition-colors cursor-pointer">
+              Start Part A Mock (20 Marks)
+            </button>
+          </div>
+        </div>
+
+        <!-- KPI Summary -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-2xs">
+            <p class="text-xs font-medium text-slate-500">Questions Solved</p>
+            <p class="text-2xl font-bold text-slate-900 mt-1">${totalAnswered}</p>
+          </div>
+          <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-2xs">
+            <p class="text-xs font-medium text-slate-500">Overall Accuracy</p>
+            <p class="text-2xl font-bold text-emerald-600 mt-1">${totalAnswered > 0 ? overallAcc + '%' : '—'}</p>
+          </div>
+          <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-2xs">
+            <p class="text-xs font-medium text-slate-500">Best Part A Mock</p>
+            <p class="text-2xl font-bold text-indigo-600 mt-1">${bestMockScore !== null ? bestMockScore + ' / 20' : '—'}</p>
+          </div>
+          <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-2xs">
+            <p class="text-xs font-medium text-slate-500">Chapters Mastered</p>
+            <p class="text-2xl font-bold text-slate-900 mt-1">${masteredCount} / 10</p>
+          </div>
+        </div>
+
+        <!-- Custom Practice Builder -->
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div>
+              <h3 class="text-base font-bold text-slate-900">Custom Practice Session</h3>
+              <p class="text-xs text-slate-500">Instant answer checking with step-by-step explanations.</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Branch</label>
+              <select id="filter-branch" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                ${['All', 'Physical', 'Inorganic', 'Organic'].map(b => `<option value="${b}" ${state.filters.branch === b ? 'selected' : ''}>${b === 'All' ? 'All Branches' : b + ' Chemistry'}</option>`).join('')}
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Chapter</label>
+              <select id="filter-chapter" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <option value="all" ${state.filters.chapterId === 'all' ? 'selected' : ''}>All Matching Chapters</option>
+                ${filteredChapters.map(c => `<option value="${c.id}" ${String(state.filters.chapterId) === String(c.id) ? 'selected' : ''}>${c.id}. ${c.name}</option>`).join('')}
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Question Type</label>
+              <select id="filter-type" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <option value="all" ${state.filters.qType === 'all' ? 'selected' : ''}>MCQs + Fill-in-the-Blanks</option>
+                <option value="mcq" ${state.filters.qType === 'mcq' ? 'selected' : ''}>MCQs Only</option>
+                <option value="fib" ${state.filters.qType === 'fib' ? 'selected' : ''}>Fill-in-the-Blanks Only</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Questions</label>
+              <div class="flex gap-2">
+                <select id="filter-count" class="flex-1 rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                  ${[5, 10, 15, 25, 50].map(n => `<option value="${n}" ${state.filters.count === n ? 'selected' : ''}>${n} Qs</option>`).join('')}
+                </select>
+                <button id="btn-start-custom" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition-colors shrink-0">
+                  Start
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 10-Chapter Blueprint Grid -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-base font-bold text-slate-900">10 Syllabus Chapters (KSEAB 2026–27)</h3>
+            <span class="text-xs text-slate-500">${filteredChapters.length} shown</span>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+            ${filteredChapters.map(ch => {
+              const st = chapterStats[ch.id] || { attempted: 0, correct: 0 };
+              const acc = st.attempted > 0 ? Math.round((st.correct / st.attempted) * 100) : 0;
+              return `
+                <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-2xs flex flex-col justify-between gap-3 hover:border-indigo-300 transition-colors">
+                  <div class="flex items-start justify-between gap-3">
+                    <div class="space-y-1">
+                      <div class="flex items-center gap-2 flex-wrap">
+                        <span class="text-xs font-bold text-slate-400">UNIT ${ch.id}</span>
+                        <span class="px-2 py-0.5 rounded-full text-[11px] font-semibold border ${branchBadgeClass(ch.branch)}">${ch.branch}</span>
+                      </div>
+                      <h4 class="text-sm sm:text-base font-bold text-slate-900">${ch.name}</h4>
+                    </div>
+                    <div class="text-right shrink-0">
+                      <span class="inline-block px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold">${ch.marks} Marks</span>
+                      <p class="text-[11px] text-slate-400 mt-0.5">${ch.hours} hrs</p>
+                    </div>
+                  </div>
+                  <div class="flex items-center justify-between gap-4 pt-1">
+                    <div class="flex-1">
+                      <div class="flex items-center justify-between text-xs mb-1">
+                        <span class="text-slate-500">${st.attempted > 0 ? `${st.correct}/${st.attempted} correct` : 'Not attempted'}</span>
+                        <span class="font-semibold text-slate-700">${st.attempted > 0 ? acc + '%' : '0%'}</span>
+                      </div>
+                      <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                        <div class="h-full bg-indigo-600 rounded-full transition-all" style="width: ${acc}%"></div>
+                      </div>
+                    </div>
+                    <button data-chapter-start="${ch.id}" class="px-3.5 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold transition-colors shrink-0">
+                      Practice
+                    </button>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `;
+
+      // Attach listeners
+      document.getElementById('btn-start-mock').addEventListener('click', startPartAMock);
+      document.getElementById('filter-branch').addEventListener('change', (e) => {
+        state.filters.branch = e.target.value;
+        state.filters.chapterId = 'all';
+        renderDashboard();
+      });
+      document.getElementById('filter-chapter').addEventListener('change', (e) => {
+        state.filters.chapterId = e.target.value;
+      });
+      document.getElementById('filter-type').addEventListener('change', (e) => {
+        state.filters.qType = e.target.value;
+      });
+      document.getElementById('filter-count').addEventListener('change', (e) => {
+        state.filters.count = Number(e.target.value);
+      });
+      document.getElementById('btn-start-custom').addEventListener('click', startCustomQuiz);
+
+      container.querySelectorAll('[data-chapter-start]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const chId = Number(btn.getAttribute('data-chapter-start'));
+          startChapterQuiz(chId);
+        });
+      });
+    }
+
+    // =========================================================================
+    // 8. QUIZ LAUNCHERS
+    // =========================================================================
+    function startPartAMock() {
+      // Authentic KSEAB Part A: 15 MCQs + 5 Fill-in-the-Blanks = 20 Marks, 20 minutes
+      const mcqs = shuffleArray(QUESTIONS.filter(q => q.type === 'mcq')).slice(0, 15);
+      const fibs = shuffleArray(QUESTIONS.filter(q => q.type === 'fib')).slice(0, 5);
+      const combined = [...mcqs, ...fibs];
+      launchQuiz({
+        mode: 'mock',
+        title: 'KSEAB Part A Mock Test (15 MCQs + 5 Fill-in-the-Blanks)',
+        questions: combined,
+        durationSec: 20 * 60
+      });
+    }
+
+    function startChapterQuiz(chapterId) {
+      const ch = getChapter(chapterId);
+      const qs = shuffleArray(QUESTIONS.filter(q => q.chapterId === chapterId));
+      launchQuiz({
+        mode: 'practice',
+        title: `Unit ${ch.id}: ${ch.name}`,
+        questions: qs,
+        durationSec: 0
+      });
+    }
+
+    function startCustomQuiz() {
+      let pool = [...QUESTIONS];
+      if (state.filters.branch !== 'All') {
+        const validIds = new Set(CHAPTERS.filter(c => c.branch === state.filters.branch).map(c => c.id));
+        pool = pool.filter(q => validIds.has(q.chapterId));
+      }
+      if (state.filters.chapterId !== 'all') {
+        pool = pool.filter(q => q.chapterId === Number(state.filters.chapterId));
+      }
+      if (state.filters.qType !== 'all') {
+        pool = pool.filter(q => q.type === state.filters.qType);
+      }
+      if (pool.length === 0) {
+        showToast('No questions match your current filters.');
+        return;
+      }
+      const selected = shuffleArray(pool).slice(0, state.filters.count);
+      const title = state.filters.chapterId !== 'all'
+        ? `Practice: ${getChapter(Number(state.filters.chapterId)).name}`
+        : state.filters.branch !== 'All'
+          ? `${state.filters.branch} Chemistry Practice`
+          : 'Custom Chemistry Practice';
+
+      launchQuiz({
+        mode: 'practice',
+        title,
+        questions: selected,
+        durationSec: 0
+      });
+    }
+
+    function launchQuiz({ mode, title, questions, durationSec }) {
+      stopQuizTimer();
+      state.quiz = {
+        mode,
+        title,
+        questions,
+        index: 0,
+        answers: {},
+        checked: {},
+        flagged: {},
+        startTime: Date.now(),
+        durationSec,
+        remainingSec: durationSec,
+        elapsedSec: 0,
+        submitted: false,
+        timerId: null
+      };
+
+      state.quiz.timerId = setInterval(() => {
+        if (!state.quiz || state.quiz.submitted) return;
+        if (state.quiz.mode === 'mock') {
+          state.quiz.remainingSec -= 1;
+          const timerEl = document.getElementById('quiz-timer');
+          if (timerEl) {
+            timerEl.textContent = formatTime(state.quiz.remainingSec);
+            if (state.quiz.remainingSec <= 120) {
+              timerEl.classList.add('text-rose-600');
+            }
+          }
+          if (state.quiz.remainingSec <= 0) {
+            showToast('Time is up! Submitting your Part A Mock.');
+            submitQuiz();
+          }
+        } else {
+          state.quiz.elapsedSec += 1;
+          const timerEl = document.getElementById('quiz-timer');
+          if (timerEl) timerEl.textContent = formatTime(state.quiz.elapsedSec);
+        }
+      }, 1000);
+
+      applyView('quiz');
+    }
+
+    // =========================================================================
+    // 9. ACTIVE QUIZ VIEW
+    // =========================================================================
+    function renderQuiz() {
+      const container = document.getElementById('view-quiz');
+      const quiz = state.quiz;
+      if (!quiz) return;
+
+      const q = quiz.questions[quiz.index];
+      const ch = getChapter(q.chapterId);
+      const userAns = quiz.answers[q.id];
+      const isChecked = !!quiz.checked[q.id];
+      const isFlagged = !!quiz.flagged[q.id];
+      const answeredCount = Object.keys(quiz.answers).filter(id => {
+        const val = quiz.answers[id];
+        return val !== undefined && val !== null && String(val).trim() !== '';
+      }).length;
+
+      const timerText = quiz.mode === 'mock' ? formatTime(quiz.remainingSec) : formatTime(quiz.elapsedSec);
+
+      container.innerHTML = `
+        <!-- Quiz Top Bar -->
+        <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-2xs flex flex-wrap items-center justify-between gap-3">
+          <div class="min-w-0">
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded-md text-[11px] font-bold uppercase ${quiz.mode === 'mock' ? 'bg-amber-100 text-amber-800' : 'bg-indigo-100 text-indigo-800'}">
+                ${quiz.mode === 'mock' ? 'Exam Mode' : 'Practice Mode'}
+              </span>
+              <span class="text-xs text-slate-500">Question ${quiz.index + 1} of ${quiz.questions.length}</span>
+            </div>
+            <h2 class="text-sm sm:text-base font-bold text-slate-900 truncate mt-0.5">${quiz.title}</h2>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <div class="px-3 py-1.5 rounded-xl bg-slate-100 text-slate-800 text-sm font-mono font-bold flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span id="quiz-timer">${timerText}</span>
+            </div>
+            <button id="btn-submit-quiz" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors">
+              ${quiz.mode === 'mock' ? 'Submit Test' : 'Finish Quiz'}
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+          <!-- Question Card -->
+          <div class="lg:col-span-8 bg-white rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-2xs space-y-5">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold border ${branchBadgeClass(ch.branch)}">Unit ${ch.id}: ${ch.name}</span>
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">${q.type === 'mcq' ? 'MCQ · 1 Mark' : 'Fill in the Blank · 1 Mark'}</span>
+              </div>
+              <button id="btn-flag-q" class="px-3 py-1 rounded-lg text-xs font-semibold border transition-colors ${isFlagged ? 'bg-amber-50 border-amber-300 text-amber-700' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'}">
+                ${isFlagged ? 'Flagged' : 'Flag for Review'}
+              </button>
+            </div>
+
+            <p class="chem text-base sm:text-lg font-semibold text-slate-900 leading-relaxed">${q.prompt}</p>
+
+            ${q.type === 'mcq' ? renderMcqOptions(q, userAns, isChecked) : renderFibInput(q, userAns, isChecked)}
+
+            <!-- Instant Explanation in Practice Mode -->
+            ${isChecked ? renderFeedbackBox(q, userAns) : ''}
+
+            <!-- Footer Controls -->
+            <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100">
+              <div class="flex items-center gap-2">
+                <button id="btn-prev-q" class="px-4 py-2 rounded-xl border border-slate-200 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-40" ${quiz.index === 0 ? 'disabled' : ''}>
+                  Previous
+                </button>
+                <button id="btn-next-q" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold disabled:opacity-40" ${quiz.index === quiz.questions.length - 1 ? 'disabled' : ''}>
+                  Next
+                </button>
+              </div>
+              ${quiz.mode === 'practice' && !isChecked ? `
+                <button id="btn-check-q" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition-colors">
+                  Check Answer
+                </button>
+              ` : ''}
+            </div>
+          </div>
+
+          <!-- Question Palette -->
+          <div class="lg:col-span-4 bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-2xs space-y-4">
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-bold text-slate-900">Question Palette</h3>
+              <span class="text-xs font-semibold text-slate-500">${answeredCount}/${quiz.questions.length} answered</span>
+            </div>
+            <div class="grid grid-cols-5 gap-2">
+              ${quiz.questions.map((item, idx) => {
+                const ans = quiz.answers[item.id];
+                const hasAns = ans !== undefined && ans !== null && String(ans).trim() !== '';
+                const checked = !!quiz.checked[item.id];
+                const flagged = !!quiz.flagged[item.id];
+                const isCur = idx === quiz.index;
+
+                let cls = 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200';
+                if (checked) {
+                  cls = isQuestionCorrect(item, ans)
+                    ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
+                    : 'bg-rose-100 text-rose-800 border-rose-300';
+                } else if (flagged) {
+                  cls = 'bg-amber-100 text-amber-800 border-amber-300';
+                } else if (hasAns) {
+                  cls = 'bg-indigo-600 text-white border-indigo-600';
+                }
+
+                if (isCur) cls += ' ring-2 ring-indigo-500 ring-offset-1';
+
+                return `<button data-jump-q="${idx}" class="h-9 rounded-lg text-xs font-bold border transition-all ${cls}">${idx + 1}</button>`;
+              }).join('')}
+            </div>
+            <div class="text-[11px] text-slate-500 space-y-1 pt-2 border-t border-slate-100">
+              <p>Shortcuts: <span class="font-semibold text-slate-700">1–4</span> select option · <span class="font-semibold text-slate-700">← / →</span> navigate · <span class="font-semibold text-slate-700">F</span> flag</p>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Event Listeners
+      if (q.type === 'mcq') {
+        container.querySelectorAll('[data-opt-idx]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            if (quiz.checked[q.id]) return;
+            quiz.answers[q.id] = Number(btn.getAttribute('data-opt-idx'));
+            renderQuiz();
+          });
+        });
+      } else {
+        const input = document.getElementById('fib-input');
+        if (input) {
+          input.addEventListener('input', (e) => {
+            quiz.answers[q.id] = e.target.value;
+          });
+        }
+        container.querySelectorAll('[data-fib-hint]').forEach(chip => {
+          chip.addEventListener('click', () => {
+            if (quiz.checked[q.id]) return;
+            const val = chip.getAttribute('data-fib-hint');
+            quiz.answers[q.id] = val;
+            renderQuiz();
+          });
+        });
+      }
+
+      document.getElementById('btn-flag-q').addEventListener('click', () => {
+        quiz.flagged[q.id] = !quiz.flagged[q.id];
+        renderQuiz();
+      });
+
+      document.getElementById('btn-prev-q').addEventListener('click', () => {
+        if (quiz.index > 0) {
+          quiz.index -= 1;
+          renderQuiz();
+        }
+      });
+
+      document.getElementById('btn-next-q').addEventListener('click', () => {
+        if (quiz.index < quiz.questions.length - 1) {
+          quiz.index += 1;
+          renderQuiz();
+        }
+      });
+
+      const checkBtn = document.getElementById('btn-check-q');
+      if (checkBtn) {
+        checkBtn.addEventListener('click', () => {
+          const val = quiz.answers[q.id];
+          if (val === undefined || val === null || String(val).trim() === '') {
+            showToast('Select or enter an answer first.');
+            return;
+          }
+          quiz.checked[q.id] = true;
+          renderQuiz();
+        });
+      }
+
+      container.querySelectorAll('[data-jump-q]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          quiz.index = Number(btn.getAttribute('data-jump-q'));
+          renderQuiz();
+        });
+      });
+
+      document.getElementById('btn-submit-quiz').addEventListener('click', () => {
+        const unanswered = quiz.questions.length - answeredCount;
+        if (unanswered > 0) {
+          openModal({
+            title: 'Submit Quiz?',
+            body: `You have ${unanswered} unanswered question${unanswered > 1 ? 's' : ''}. Do you want to submit now?`,
+            confirmText: 'Submit',
+            onConfirm: submitQuiz
+          });
+        } else {
+          submitQuiz();
+        }
+      });
+    }
+
+    function renderMcqOptions(q, userAns, isChecked) {
+      const letters = ['A', 'B', 'C', 'D'];
+      return `
+        <div class="space-y-2.5">
+          ${q.options.map((opt, idx) => {
+            const selected = Number(userAns) === idx;
+            const isRight = idx === q.answer;
+            let cls = 'border-slate-200 bg-white hover:border-indigo-300 hover:bg-indigo-50/40';
+            if (isChecked) {
+              if (isRight) cls = 'border-emerald-500 bg-emerald-50 text-emerald-950';
+              else if (selected && !isRight) cls = 'border-rose-500 bg-rose-50 text-rose-950';
+              else cls = 'border-slate-200 bg-slate-50 opacity-75';
+            } else if (selected) {
+              cls = 'border-indigo-600 bg-indigo-50 ring-1 ring-indigo-600';
+            }
+            return `
+              <button data-opt-idx="${idx}" ${isChecked ? 'disabled' : ''} class="w-full text-left px-4 py-3 rounded-xl border transition-all flex items-center gap-3 ${cls}">
+                <span class="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 ${selected || (isChecked && isRight) ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-700'} ${isChecked && isRight ? '!bg-emerald-600' : ''} ${isChecked && selected && !isRight ? '!bg-rose-600' : ''}">
+                  ${letters[idx]}
+                </span>
+                <span class="chem text-sm sm:text-base font-medium">${opt}</span>
+              </button>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+
+    function renderFibInput(q, userAns, isChecked) {
+      const val = userAns || '';
+      const correct = isQuestionCorrect(q, val);
+      const borderCls = isChecked
+        ? (correct ? 'border-emerald-500 bg-emerald-50' : 'border-rose-500 bg-rose-50')
+        : 'border-slate-300 focus:ring-2 focus:ring-indigo-500';
+      return `
+        <div class="space-y-3">
+          <input id="fib-input" type="text" value="${val.replace(/"/g, '&quot;')}" ${isChecked ? 'disabled' : ''} placeholder="Type your answer here..." class="w-full rounded-xl border px-4 py-3 text-sm sm:text-base font-medium focus:outline-none ${borderCls}" />
+          <div class="space-y-1.5">
+            <p class="text-xs font-semibold text-slate-500">Quick-pick word bank (optional):</p>
+            <div class="flex flex-wrap gap-2">
+              ${q.hints.map(h => `
+                <button type="button" data-fib-hint="${h}" ${isChecked ? 'disabled' : ''} class="px-3 py-1 rounded-lg text-xs font-medium border border-slate-200 bg-slate-50 hover:bg-indigo-50 hover:border-indigo-300 text-slate-700 transition-colors">
+                  ${h}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderFeedbackBox(q, userAns) {
+      const ok = isQuestionCorrect(q, userAns);
+      const correctText = q.type === 'mcq' ? q.options[q.answer] : q.accepted[0];
+      return `
+        <div class="rounded-xl p-4 border ${ok ? 'bg-emerald-50 border-emerald-200 text-emerald-950' : 'bg-rose-50 border-rose-200 text-rose-950'} space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wide">${ok ? 'Correct Answer' : 'Incorrect'}</span>
+            ${!ok ? `<span class="chem text-xs font-semibold">Correct: ${correctText}</span>` : ''}
+          </div>
+          <p class="chem text-sm leading-relaxed">${q.explanation}</p>
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // 10. SUBMIT & RESULTS VIEW
+    // =========================================================================
+    function submitQuiz() {
+      const quiz = state.quiz;
+      if (!quiz) return;
+      stopQuizTimer();
+      quiz.submitted = true;
+
+      let score = 0;
+      quiz.questions.forEach(q => {
+        const ans = quiz.answers[q.id];
+        const ok = isQuestionCorrect(q, ans);
+        if (ok) score += 1;
+
+        state.stats.totalAnswered += 1;
+        if (ok) state.stats.totalCorrect += 1;
+
+        if (!state.stats.chapterStats[q.chapterId]) {
+          state.stats.chapterStats[q.chapterId] = { attempted: 0, correct: 0 };
+        }
+        state.stats.chapterStats[q.chapterId].attempted += 1;
+        if (ok) state.stats.chapterStats[q.chapterId].correct += 1;
+      });
+
+      if (quiz.mode === 'mock') {
+        if (state.stats.bestMockScore === null || score > state.stats.bestMockScore) {
+          state.stats.bestMockScore = score;
+        }
+      }
+      saveStats();
+
+      quiz.finalScore = score;
+      quiz.timeSpentSec = quiz.mode === 'mock'
+        ? (quiz.durationSec - Math.max(0, quiz.remainingSec))
+        : quiz.elapsedSec;
+      state.resultsFilter = 'all';
+      applyView('results');
+    }
+
+    function renderResults() {
+      const container = document.getElementById('view-results');
+      const quiz = state.quiz;
+      if (!quiz) return;
+
+      const total = quiz.questions.length;
+      const score = quiz.finalScore;
+      const pct = total > 0 ? Math.round((score / total) * 100) : 0;
+
+      // Branch accuracy
+      const branches = ['Physical', 'Inorganic', 'Organic'];
+      const branchSummary = branches.map(b => {
+        const qs = quiz.questions.filter(q => getChapter(q.chapterId).branch === b);
+        const right = qs.filter(q => isQuestionCorrect(q, quiz.answers[q.id])).length;
+        return { branch: b, total: qs.length, right, pct: qs.length > 0 ? Math.round((right / qs.length) * 100) : 0 };
+      }).filter(x => x.total > 0);
+
+      const incorrectQs = quiz.questions.filter(q => !isQuestionCorrect(q, quiz.answers[q.id]));
+
+      let reviewList = quiz.questions;
+      if (state.resultsFilter === 'incorrect') reviewList = incorrectQs;
+      else if (state.resultsFilter === 'flagged') reviewList = quiz.questions.filter(q => quiz.flagged[q.id]);
+
+      container.innerHTML = `
+        <!-- Score Hero -->
+        <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-2xs flex flex-col md:flex-row md:items-center md:justify-between gap-5">
+          <div class="space-y-1.5">
+            <span class="text-xs font-bold uppercase tracking-wider text-indigo-600">${quiz.mode === 'mock' ? 'Part A Mock Results' : 'Practice Summary'}</span>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">${score} / ${total} <span class="text-lg font-semibold text-slate-500">(${pct}%)</span></h2>
+            <p class="text-sm text-slate-600">Completed in <span class="font-semibold text-slate-800">${formatTime(quiz.timeSpentSec)}</span> · ${quiz.title}</p>
+          </div>
+          <div class="flex flex-wrap gap-2.5">
+            ${incorrectQs.length > 0 ? `
+              <button id="btn-retry-wrong" class="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold transition-colors">
+                Retry ${incorrectQs.length} Incorrect
+              </button>
+            ` : ''}
+            <button id="btn-back-dash" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition-colors">
+              Back to Dashboard
+            </button>
+          </div>
+        </div>
+
+        <!-- Branch Performance Chart -->
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs space-y-3">
+          <h3 class="text-base font-bold text-slate-900">Performance by Chemistry Branch</h3>
+          <div class="relative h-56">
+            <canvas id="results-chart"></canvas>
+          </div>
+        </div>
+
+        <!-- Question-by-Question Review -->
+        <div class="space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <h3 class="text-base font-bold text-slate-900">Detailed Review</h3>
+            <div class="flex items-center gap-1.5">
+              ${['all', 'incorrect', 'flagged'].map(f => `
+                <button data-res-filter="${f}" class="px-3 py-1 rounded-lg text-xs font-semibold capitalize transition-colors ${state.resultsFilter === f ? 'bg-indigo-600 text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}">
+                  ${f}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="space-y-3">
+            ${reviewList.length === 0 ? `<div class="bg-white rounded-2xl p-6 border border-slate-200 text-sm text-slate-500 text-center">No questions in this filter.</div>` : reviewList.map((q, idx) => {
+              const ch = getChapter(q.chapterId);
+              const ans = quiz.answers[q.id];
+              const ok = isQuestionCorrect(q, ans);
+              const userText = q.type === 'mcq'
+                ? (ans !== undefined ? q.options[ans] : 'Not answered')
+                : (ans && String(ans).trim() !== '' ? ans : 'Not answered');
+              const correctText = q.type === 'mcq' ? q.options[q.answer] : q.accepted[0];
+
+              return `
+                <div class="bg-white rounded-2xl p-5 border ${ok ? 'border-emerald-200' : 'border-rose-200'} shadow-2xs space-y-2.5">
+                  <div class="flex items-center justify-between gap-2 flex-wrap">
+                    <span class="text-xs font-semibold text-slate-500">Unit ${ch.id}: ${ch.name}</span>
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold ${ok ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+                      ${ok ? 'Correct (+1)' : 'Incorrect (0)'}
+                    </span>
+                  </div>
+                  <p class="chem text-sm sm:text-base font-semibold text-slate-900">${q.prompt}</p>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm pt-1">
+                    <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+                      <span class="text-slate-500 font-medium">Your answer:</span>
+                      <span class="chem font-semibold ${ok ? 'text-emerald-700' : 'text-rose-700'} ml-1">${userText}</span>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200">
+                      <span class="text-emerald-700 font-medium">Correct answer:</span>
+                      <span class="chem font-semibold text-emerald-900 ml-1">${correctText}</span>
+                    </div>
+                  </div>
+                  <p class="chem text-xs sm:text-sm text-slate-600 leading-relaxed pt-1">${q.explanation}</p>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `;
+
+      // Render Chart.js
+      if (state.charts.results) state.charts.results.destroy();
+      const ctx = document.getElementById('results-chart').getContext('2d');
+      state.charts.results = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: branchSummary.map(b => `${b.branch} (${b.right}/${b.total})`),
+          datasets: [{
+            label: 'Accuracy (%)',
+            data: branchSummary.map(b => b.pct),
+            backgroundColor: ['#0284c7', '#d97706', '#059669'],
+            borderRadius: 8,
+            maxBarThickness: 44
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: { beginAtZero: true, max: 100, ticks: { callback: v => v + '%' } }
+          },
+          plugins: { legend: { display: false } }
+        }
+      });
+
+      const retryBtn = document.getElementById('btn-retry-wrong');
+      if (retryBtn) {
+        retryBtn.addEventListener('click', () => {
+          launchQuiz({
+            mode: 'practice',
+            title: 'Retry Incorrect Questions',
+            questions: shuffleArray(incorrectQs),
+            durationSec: 0
+          });
+        });
+      }
+
+      document.getElementById('btn-back-dash').addEventListener('click', () => {
+        state.quiz = null;
+        applyView('dashboard');
+      });
+
+      container.querySelectorAll('[data-res-filter]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.resultsFilter = btn.getAttribute('data-res-filter');
+          renderResults();
+        });
+      });
+    }
+
+    // =========================================================================
+    // 11. FLASHCARDS VIEW
+    // =========================================================================
+    function renderFlashcards() {
+      const container = document.getElementById('view-flashcards');
+      const fc = state.flashcards;
+
+      const filtered = fc.order
+        .map(idx => FLASHCARDS[idx])
+        .filter(card => fc.chapterId === 'all' || card.chapterId === Number(fc.chapterId));
+
+      if (fc.index >= filtered.length) fc.index = 0;
+      const card = filtered[fc.index];
+      const ch = getChapter(card.chapterId);
+      const isKnown = fc.known.has(card.id);
+
+      container.innerHTML = `
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div>
+            <h2 class="text-xl font-extrabold text-slate-900">Formula &amp; Reaction Flashcards</h2>
+            <p class="text-xs sm:text-sm text-slate-500">Tap the card to flip between prompt and high-yield KSEAB answer.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <select id="fc-chapter-filter" class="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="all" ${fc.chapterId === 'all' ? 'selected' : ''}>All 10 Chapters (${FLASHCARDS.length})</option>
+              ${CHAPTERS.map(c => `<option value="${c.id}" ${String(fc.chapterId) === String(c.id) ? 'selected' : ''}>${c.id}. ${c.name}</option>`).join('')}
+            </select>
+            <button id="btn-fc-shuffle" class="px-3.5 py-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-sm font-medium text-slate-700">
+              Shuffle
+            </button>
+          </div>
+        </div>
+
+        <div class="max-w-2xl mx-auto space-y-4">
+          <div class="flex items-center justify-between text-xs font-semibold text-slate-500">
+            <span>Card ${fc.index + 1} of ${filtered.length}</span>
+            <span>${fc.known.size} marked as mastered</span>
+          </div>
+
+          <!-- Flip Card -->
+          <div id="fc-card-box" class="perspective-1000 cursor-pointer select-none">
+            <div class="preserve-3d relative min-h-[260px] sm:min-h-[290px] ${fc.flipped ? 'rotate-y-180' : ''}">
+              <!-- Front -->
+              <div class="backface-hidden absolute inset-0 bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm flex flex-col justify-between">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold border ${branchBadgeClass(ch.branch)}">Unit ${ch.id}: ${ch.name}</span>
+                  ${isKnown ? '<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">Mastered</span>' : ''}
+                </div>
+                <div class="text-center space-y-2 my-auto py-4">
+                  <p class="text-xs font-bold uppercase tracking-wider text-indigo-600">Concept / Formula</p>
+                  <h3 class="chem text-xl sm:text-2xl font-extrabold text-slate-900">${card.front}</h3>
+                </div>
+                <p class="text-center text-xs text-slate-400">Click card to reveal answer</p>
+              </div>
+
+              <!-- Back -->
+              <div class="backface-hidden rotate-y-180 absolute inset-0 bg-indigo-950 text-white rounded-2xl p-6 sm:p-8 shadow-sm flex flex-col justify-between">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-semibold text-indigo-300">Unit ${ch.id}: ${ch.name}</span>
+                  <span class="text-xs font-bold uppercase tracking-wider text-indigo-300">Key Takeaway</span>
+                </div>
+                <div class="my-auto py-4 text-center">
+                  <p class="chem text-base sm:text-lg font-medium leading-relaxed text-indigo-50">${card.back}</p>
+                </div>
+                <p class="text-center text-xs text-indigo-300">Click card to flip back</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Controls -->
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-2">
+              <button id="btn-fc-prev" class="px-4 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-sm font-medium text-slate-700">Previous</button>
+              <button id="btn-fc-next" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold">Next</button>
+            </div>
+            <button id="btn-fc-known" class="px-4 py-2 rounded-xl text-sm font-semibold border transition-colors ${isKnown ? 'bg-emerald-100 border-emerald-300 text-emerald-800' : 'bg-white border-slate-200 text-slate-700 hover:bg-emerald-50'}">
+              ${isKnown ? 'Mastered ✓' : 'Mark as Mastered'}
+            </button>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('fc-chapter-filter').addEventListener('change', (e) => {
+        fc.chapterId = e.target.value;
+        fc.index = 0;
+        fc.flipped = false;
+        renderFlashcards();
+      });
+      document.getElementById('btn-fc-shuffle').addEventListener('click', () => {
+        fc.order = shuffleArray(FLASHCARDS.map((_, i) => i));
+        fc.index = 0;
+        fc.flipped = false;
+        renderFlashcards();
+      });
+      document.getElementById('fc-card-box').addEventListener('click', () => {
+        fc.flipped = !fc.flipped;
+        renderFlashcards();
+      });
+      document.getElementById('btn-fc-prev').addEventListener('click', () => {
+        fc.index = (fc.index - 1 + filtered.length) % filtered.length;
+        fc.flipped = false;
+        renderFlashcards();
+      });
+      document.getElementById('btn-fc-next').addEventListener('click', () => {
+        fc.index = (fc.index + 1) % filtered.length;
+        fc.flipped = false;
+        renderFlashcards();
+      });
+      document.getElementById('btn-fc-known').addEventListener('click', () => {
+        if (fc.known.has(card.id)) fc.known.delete(card.id);
+        else fc.known.add(card.id);
+        renderFlashcards();
+      });
+    }
+
+    // =========================================================================
+    // 12. BLUEPRINT VIEW
+    // =========================================================================
+    function renderBlueprint() {
+      const container = document.getElementById('view-blueprint');
+      container.innerHTML = `
+        <div class="space-y-1">
+          <h2 class="text-xl font-extrabold text-slate-900">KSEAB 2nd PUC Chemistry Blueprint (2026–27)</h2>
+          <p class="text-sm text-slate-500">Subject Code 34 · 70 Marks Theory (3 Hours, 46 Questions) + 30 Marks Practical (2 Hours)</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <!-- Paper Pattern Table -->
+          <div class="lg:col-span-7 bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs space-y-3">
+            <h3 class="text-base font-bold text-slate-900">Theory Question Paper Pattern (70 Marks)</h3>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-sm">
+                <thead>
+                  <tr class="border-b border-slate-200 text-xs uppercase text-slate-500">
+                    <th class="py-2 pr-3">Part</th>
+                    <th class="py-2 pr-3">Questions &amp; Choice</th>
+                    <th class="py-2 text-right">Marks</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  ${PAPER_PATTERN.map(p => `
+                    <tr>
+                      <td class="py-2.5 pr-3 font-bold text-indigo-700 whitespace-nowrap">${p.part}</td>
+                      <td class="py-2.5 pr-3 text-slate-700">${p.structure}</td>
+                      <td class="py-2.5 text-right font-bold text-slate-900">${p.totalMarks}</td>
+                    </tr>
+                  `).join('')}
+                  <tr class="bg-slate-50 font-bold">
+                    <td class="py-2.5 pr-3">Total</td>
+                    <td class="py-2.5 pr-3 text-slate-600">Blueprint sets 105 marks with choice; answer 70 marks</td>
+                    <td class="py-2.5 text-right text-indigo-700">70</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Branch & Chapter Marks Chart -->
+          <div class="lg:col-span-5 bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs space-y-3">
+            <h3 class="text-base font-bold text-slate-900">Marks by Branch (105 Blueprint Total)</h3>
+            <div class="relative h-60">
+              <canvas id="blueprint-chart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Practical & Deleted Chapters -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-2xs space-y-2.5">
+            <h3 class="text-base font-bold text-slate-900">Practical Exam Breakdown (30 Marks · 2 Hours)</h3>
+            <ul class="text-sm text-slate-700 space-y-1.5 list-disc list-inside">
+              <li><span class="font-semibold">Salt Analysis (10 marks):</span> Preliminary tests, acid &amp; basic radicals, confirmatory tests.</li>
+              <li><span class="font-semibold">Volumetric Titration (10 marks):</span> Molarity of KMnO<sub>4</sub> using standard 0.1 M FAS (Mohr’s salt).</li>
+              <li><span class="font-semibold">Attendance ≥75% (5 marks)</span> &amp; <span class="font-semibold">Certified Practical Record (5 marks)</span>.</li>
+            </ul>
+          </div>
+
+          <div class="bg-rose-50/70 rounded-2xl p-5 border border-rose-200 space-y-2.5">
+            <h3 class="text-base font-bold text-rose-950">Excluded Chapters (Not in 2026–27 Blueprint)</h3>
+            <p class="text-xs text-rose-800">Skip these 6 older-syllabus chapters when revising from older guides:</p>
+            <div class="flex flex-wrap gap-2 pt-1">
+              ${DELETED_CHAPTERS.map(d => `<span class="px-2.5 py-1 rounded-lg bg-white border border-rose-200 text-xs font-semibold text-rose-800">${d}</span>`).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+
+      if (state.charts.blueprint) state.charts.blueprint.destroy();
+      const ctx = document.getElementById('blueprint-chart').getContext('2d');
+      state.charts.blueprint = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Physical (37 marks)', 'Inorganic (21 marks)', 'Organic (47 marks)'],
+          datasets: [{
+            data: [37, 21, 47],
+            backgroundColor: ['#0284c7', '#d97706', '#059669'],
+            borderWidth: 2,
+            borderColor: '#ffffff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom' }
+          }
+        }
+      });
+    }
+
+    // =========================================================================
+    // 13. GLOBAL KEYBOARD SHORTCUTS & INIT
+    // =========================================================================
+    document.addEventListener('keydown', (e) => {
+      if (state.view !== 'quiz' || !state.quiz || state.quiz.submitted) return;
+      if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
+
+      const quiz = state.quiz;
+      const q = quiz.questions[quiz.index];
+
+      if (e.key === 'ArrowRight') {
+        if (quiz.index < quiz.questions.length - 1) {
+          quiz.index += 1;
+          renderQuiz();
+        }
+      } else if (e.key === 'ArrowLeft') {
+        if (quiz.index > 0) {
+          quiz.index -= 1;
+          renderQuiz();
+        }
+      } else if (e.key.toLowerCase() === 'f') {
+        quiz.flagged[q.id] = !quiz.flagged[q.id];
+        renderQuiz();
+      } else if (q.type === 'mcq' && !quiz.checked[q.id] && ['1', '2', '3', '4'].includes(e.key)) {
+        quiz.answers[q.id] = Number(e.key) - 1;
+        renderQuiz();
+      }
+    });
+
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        switchView(btn.getAttribute('data-nav'));
+      });
+    });
+
+    document.getElementById('btn-reset-open').addEventListener('click', () => {
+      openModal({
+        title: 'Reset All Progress?',
+        body: 'This will clear your saved question accuracy, chapter mastery bars, and best Part A Mock score.',
+        confirmText: 'Reset Progress',
+        confirmClass: 'bg-rose-600 hover:bg-rose-700',
+        onConfirm: () => {
+          state.stats = { totalAnswered: 0, totalCorrect: 0, bestMockScore: null, chapterStats: {} };
+          saveStats();
+          showToast('Progress reset.');
+          if (state.view === 'dashboard') renderDashboard();
+        }
+      });
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      applyView('dashboard');
+    });
+  </script>
+</body>
+</html>
